@@ -21,7 +21,7 @@
         flex: 1;
         justify-content: center;
         align-content: center;
-        max-width: 500px;
+        max-width: 700px;
         margin-top: 50px;
       "
     >
@@ -49,6 +49,15 @@
           id="fdata"
           value="32.0,23.0,49.0,-40.0,-122.0,-20.7,15.2,100.7,36.42,87.99,-87.0,-111.98,-54.56,75.57"
         />
+
+        <label class="form-label mt-4">Select Activation: </label>
+        <select class="form-select" id="acti" aria-label="Default select example">
+          <option selected>Select Activation</option>
+          <option value="relu">Relu</option>
+          <option value="tanh">Tanh</option>
+          <option value="sigmoid">Sigmoid</option>
+          <option value="liner">Liner</option>
+        </select>
         <button class="btn btn-primary mt-4" onclick="addData()">ADD</button>
 
         <div
@@ -58,6 +67,7 @@
           <h5 class="mt-4" style="color: #ff0303;">Added Data:</h5>
           <p class="mt-4" style="color: #2dff2d;" id="output1"></p>
           <p class="mt-4" style="color: #2dff2d;" id="output2"></p>
+          <p class="mt-4" style="color: #2dff2d;" id="output3"></p>
         </div>
 
         <!-- DATA TRAINING FIELD -->
@@ -87,6 +97,8 @@
     <script type="text/javascript">
       var cel_valu = [];
       var far_valu = [];
+      var epocs;
+      var activation;
       //const celsius_values = tf.tensor([-30, 45, 32, 4, 8, 29, 90, 12, 29, -40, 9, 30, 22, -12]);
 
       //const fahrenheit_values = tf.tensor([-22, 113, 89.6, 39.2, 46.4, 84.2, 194, 53.6, 84.2, -40, 48.2, 86, 71.6, 10.4]);
@@ -99,6 +111,7 @@
       function addData() {
         var cel_val = document.getElementById("cdata").value;
         var far_val = document.getElementById("fdata").value;
+        activation = document.getElementById('acti').value;
         alert("data submitted" + cel_val + far_val);
         cel_valu = cel_val.split(",").map(parseFloat);
         far_valu = far_val.split(",").map(parseFloat);
@@ -109,6 +122,7 @@
         console.log(far_valu);
         document.getElementById("output1").innerHTML = "Data_1: " + cel_valu;
         document.getElementById("output2").innerHTML = "Data_2: " + far_valu;
+        document.getElementById("output3").innerHTML = "Activation: " + activation.toUpperCase();
       }
 
       document.getElementById("press").addEventListener("click", function () {
@@ -119,7 +133,7 @@
         var datas = document.getElementById("data");
         var ins = parseFloat(datas.value);
         var epoc = document.getElementById("epoc");
-        let epocs = parseInt(epoc.value);
+         epocs = parseInt(epoc.value);
 
         console.log(ins);
         document.getElementById("output").innerText =
@@ -127,12 +141,12 @@
         const model = tf.sequential({
           layers: [
             tf.layers.dense({ inputShape: [1], units: 1 }),
-            tf.layers.dense({ units: 100, activation: "relu" }),
-            tf.layers.dense({ units: 50, activation: "relu" }),
+            tf.layers.dense({ units: 100, activation: activation }),
+            tf.layers.dense({ units: 50, activation: activation }),
             tf.layers.dense({ units: 1 })
           ]
         });
-
+           console.log(activation);
         model.summary();
 
         model.compile({
@@ -157,8 +171,9 @@
             let answers = answer.dataSync()[0];
             console.log(answers);
             answers = answers.toFixed(2);
+            console.log(epocs);
             document.getElementById("output").innerHTML =
-              "Answer: " + answers + "&deg F";
+              "Answer: " + answers + "&deg F"+"<br>Total Loss: "+trained_object.history["loss"][epocs -1]+ "<br>Total Length: "+trained_object.history["loss"].length;
           });
 
         // body...
